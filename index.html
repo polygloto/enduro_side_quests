@@ -347,18 +347,15 @@
 
   .timer-overlay.active { display: flex; }
 
-  .timer-bg {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0.35;
-    z-index: 0;
-    pointer-events: none;
+  .timer-img {
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+    display: block;
   }
-
-  .timer-overlay > *:not(.timer-bg) { position: relative; z-index: 1; }
 
   .timer-label {
     font-size: 11px;
@@ -555,9 +552,9 @@
 </div>
 
 <div class="timer-overlay" id="timerOverlay">
-  <div class="timer-bg" id="timerBg"></div>
   <div class="timer-label" id="t-timer-label">Hold</div>
   <div class="timer-exercise" id="timerExName">—</div>
+  <img class="timer-img" id="timerImg" alt="">
   <div class="timer-display" id="timerDisplay">00</div>
   <div class="timer-side" id="timerSide">&nbsp;</div>
   <div class="timer-progress"><div class="timer-bar" id="timerBar"></div></div>
@@ -950,7 +947,7 @@ function startTimer(idx) {
   timerState.totalRounds = ex.sets;
   timerState.totalTime = ex.duration;
   timerState.timeLeft = ex.duration;
-  document.getElementById('timerBg').style.backgroundImage = `url('images/${idx+1}.png')`;
+  document.getElementById('timerImg').src = `images/${idx+1}.png`;
   document.getElementById('timerOverlay').classList.add('active');
   updateTimerDisplay();
   runTick();
@@ -1055,7 +1052,6 @@ function closeTimer() {
   const overlay = document.getElementById('timerOverlay');
   overlay.classList.remove('active');
   overlay.classList.remove('rest');
-  document.getElementById('timerBg').style.backgroundImage = '';
   const t = i18n[currentLang];
   document.getElementById('pauseBtn').textContent = t.pause;
 }
