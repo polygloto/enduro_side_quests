@@ -192,12 +192,48 @@
   }
 
   .exercise-header {
+    position: relative;
+    min-height: 200px;
+    overflow: hidden;
     padding: 14px 16px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
     cursor: pointer;
     user-select: none;
+  }
+
+  .ex-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 45%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .exercise-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg,
+        rgba(13,13,13,0.92) 0%,
+        rgba(13,13,13,0.78) 35%,
+        rgba(13,13,13,0.4) 65%,
+        rgba(13,13,13,0.15) 100%),
+      linear-gradient(180deg, rgba(13,13,13,0.15), rgba(13,13,13,0.4));
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .exercise-header > .ex-num,
+  .exercise-header > .ex-info,
+  .exercise-header > .ex-toggle {
+    position: relative;
+    z-index: 2;
   }
 
   .ex-num {
@@ -299,7 +335,7 @@
   .timer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.96);
+    background: var(--bg);
     display: none;
     align-items: center;
     justify-content: center;
@@ -310,6 +346,19 @@
   }
 
   .timer-overlay.active { display: flex; }
+
+  .timer-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.35;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .timer-overlay > *:not(.timer-bg) { position: relative; z-index: 1; }
 
   .timer-label {
     font-size: 11px;
@@ -506,6 +555,7 @@
 </div>
 
 <div class="timer-overlay" id="timerOverlay">
+  <div class="timer-bg" id="timerBg"></div>
   <div class="timer-label" id="t-timer-label">Hold</div>
   <div class="timer-exercise" id="timerExName">—</div>
   <div class="timer-display" id="timerDisplay">00</div>
@@ -669,7 +719,7 @@ const i18n = {
       '<b>Задняя поверхность бедра</b> — для атаки (наклон вперёд над рулём).',
       '<b>Голеностоп</b> — контроль задней тормозной, переходы сидя/стоя.'
     ],
-    footer: 'v1.4 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
+    footer: 'v1.5 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
     ex_technique: 'Техника',
     ex_tip: 'Нюанс',
     ex_start: '▶ Старт таймер',
@@ -717,7 +767,7 @@ const i18n = {
       '<b>Hamstrings</b> — for the attack position (forward lean over the bars).',
       '<b>Ankles</b> — rear brake control, sit-to-stand transitions.'
     ],
-    footer: 'v1.4 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
+    footer: 'v1.5 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
     ex_technique: 'Technique',
     ex_tip: 'Key point',
     ex_start: '▶ Start timer',
@@ -837,6 +887,7 @@ function renderExercises() {
     return `
     <div class="exercise ${doneSet.has(i) ? 'done' : ''} ${openSet.has(i) ? 'open' : ''}" id="ex-${i}">
       <div class="exercise-header" data-action="toggle" data-idx="${i}">
+        <img class="ex-bg" src="images/${i+1}.png" loading="lazy" alt="${exT.name}">
         <div class="ex-num">${String(i+1).padStart(2,'0')}</div>
         <div class="ex-info">
           <div class="ex-name">${exT.name}</div>
@@ -899,6 +950,7 @@ function startTimer(idx) {
   timerState.totalRounds = ex.sets;
   timerState.totalTime = ex.duration;
   timerState.timeLeft = ex.duration;
+  document.getElementById('timerBg').style.backgroundImage = `url('images/${idx+1}.png')`;
   document.getElementById('timerOverlay').classList.add('active');
   updateTimerDisplay();
   runTick();
@@ -1003,6 +1055,7 @@ function closeTimer() {
   const overlay = document.getElementById('timerOverlay');
   overlay.classList.remove('active');
   overlay.classList.remove('rest');
+  document.getElementById('timerBg').style.backgroundImage = '';
   const t = i18n[currentLang];
   document.getElementById('pauseBtn').textContent = t.pause;
 }
