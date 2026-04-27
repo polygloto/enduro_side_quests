@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -363,6 +363,10 @@
     transition: width 1s linear;
   }
 
+  .timer-overlay.rest .timer-label,
+  .timer-overlay.rest .timer-display { color: var(--done); }
+  .timer-overlay.rest .timer-bar { background: var(--done); }
+
   .timer-controls {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -472,8 +476,8 @@
 <header>
   <div class="lang-switch">
     <div class="lang-switch-inner" id="langSwitch">
-      <button class="lang-btn active" data-lang="ru">RU</button>
-      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn active" data-lang="en">EN</button>
     </div>
   </div>
   <div class="brand" id="t-brand">◉ DAILY MOBILITY PROTOCOL</div>
@@ -665,16 +669,19 @@ const i18n = {
       '<b>Задняя поверхность бедра</b> — для атаки (наклон вперёд над рулём).',
       '<b>Голеностоп</b> — контроль задней тормозной, переходы сидя/стоя.'
     ],
-    footer: 'v1.2 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
+    footer: 'v1.4 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
     ex_technique: 'Техника',
     ex_tip: 'Нюанс',
     ex_start: '▶ Старт таймер',
     ex_mark: 'Отметить',
     ex_done: '✓ Сделано',
     timer_label: 'Удержание',
+    timer_rest_label: 'Отдых',
+    timer_next: 'Далее',
     timer_left: 'Левая сторона',
     timer_right: 'Правая сторона',
-    timer_set: (c, t) => `Подход ${c} из ${t}`,
+    timer_set_prefix: 'Подход',
+    timer_set_of: 'из',
     pause: 'Пауза',
     resume: 'Продолжить',
     skip: 'Дальше',
@@ -710,16 +717,19 @@ const i18n = {
       '<b>Hamstrings</b> — for the attack position (forward lean over the bars).',
       '<b>Ankles</b> — rear brake control, sit-to-stand transitions.'
     ],
-    footer: 'v1.2 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
+    footer: 'v1.4 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
     ex_technique: 'Technique',
     ex_tip: 'Key point',
     ex_start: '▶ Start timer',
     ex_mark: 'Mark',
     ex_done: '✓ Done',
     timer_label: 'Hold',
+    timer_rest_label: 'Rest',
+    timer_next: 'Next',
     timer_left: 'Left side',
     timer_right: 'Right side',
-    timer_set: (c, t) => `Set ${c} of ${t}`,
+    timer_set_prefix: 'Set',
+    timer_set_of: 'of',
     pause: 'Pause',
     resume: 'Resume',
     skip: 'Skip',
@@ -730,12 +740,13 @@ const i18n = {
 };
 
 const STORAGE = { done: 'enduro:done', lang: 'enduro:lang' };
+const REST_DURATION = 15;
 
-let currentLang = 'ru';
+let currentLang = 'en';
 const doneSet = new Set();
 const openSet = new Set();
 const timerState = {
-  active: false, paused: false, exerciseIdx: 0,
+  active: false, paused: false, phase: 'hold', exerciseIdx: 0,
   currentSide: 0, currentRound: 0, totalRounds: 2,
   timeLeft: 0, totalTime: 0, interval: null
 };
@@ -881,6 +892,7 @@ function startTimer(idx) {
   const ex = exercises[idx];
   timerState.active = true;
   timerState.paused = false;
+  timerState.phase = 'hold';
   timerState.exerciseIdx = idx;
   timerState.currentSide = 0;
   timerState.currentRound = 0;
@@ -900,7 +912,7 @@ function runTick() {
     updateTimerDisplay();
     if (timerState.timeLeft <= 0) {
       beep();
-      advance();
+      advancePhase();
     }
   }, 1000);
 }
@@ -909,44 +921,74 @@ function updateTimerDisplay() {
   const t = i18n[currentLang];
   const ex = exercises[timerState.exerciseIdx];
   const exT = ex[currentLang];
+  const isRest = timerState.phase === 'rest';
 
+  const overlay = document.getElementById('timerOverlay');
+  overlay.classList.toggle('rest', isRest);
+
+  document.getElementById('t-timer-label').textContent = isRest ? t.timer_rest_label : t.timer_label;
   document.getElementById('timerExName').textContent = exT.name;
   document.getElementById('timerDisplay').textContent = String(timerState.timeLeft).padStart(2, '0');
   const pct = (timerState.timeLeft / timerState.totalTime) * 100;
   document.getElementById('timerBar').style.width = pct + '%';
 
-  const sideText = ex.sides === 2
-    ? (timerState.currentSide === 0 ? t.timer_left : t.timer_right)
-    : '';
+  let displaySide = timerState.currentSide;
+  let displayRound = timerState.currentRound;
+  if (isRest) {
+    displaySide++;
+    if (displaySide >= ex.sides) {
+      displaySide = 0;
+      displayRound++;
+    }
+  }
+
+  let sideText = '';
+  if (ex.sides === 2) {
+    const sideLabel = displaySide === 0 ? t.timer_left : t.timer_right;
+    sideText = isRest ? `${t.timer_next}: ${sideLabel}` : sideLabel;
+  }
   document.getElementById('timerSide').textContent = sideText;
 
   const totalSets = ex.sides * timerState.totalRounds;
-  const currentSet = timerState.currentRound * ex.sides + timerState.currentSide + 1;
-  document.getElementById('roundInfo').textContent = t.timer_set(currentSet, totalSets);
+  const currentSet = displayRound * ex.sides + displaySide + 1;
+  document.getElementById('roundInfo').textContent = `${t.timer_set_prefix} ${currentSet} ${t.timer_set_of} ${totalSets}`;
 }
 
-function advance() {
+function advancePhase() {
   const ex = exercises[timerState.exerciseIdx];
+
+  if (timerState.phase === 'hold') {
+    const completedHolds = timerState.currentRound * ex.sides + timerState.currentSide + 1;
+    const totalHolds = ex.sides * timerState.totalRounds;
+    if (completedHolds >= totalHolds) {
+      doneSet.add(timerState.exerciseIdx);
+      saveDone();
+      updateDoneCount();
+      renderExercises();
+      closeTimer();
+      return;
+    }
+    timerState.phase = 'rest';
+    timerState.totalTime = REST_DURATION;
+    timerState.timeLeft = REST_DURATION;
+    updateTimerDisplay();
+    return;
+  }
+
   timerState.currentSide++;
   if (timerState.currentSide >= ex.sides) {
     timerState.currentSide = 0;
     timerState.currentRound++;
   }
-  if (timerState.currentRound >= timerState.totalRounds) {
-    doneSet.add(timerState.exerciseIdx);
-    saveDone();
-    updateDoneCount();
-    renderExercises();
-    closeTimer();
-    return;
-  }
-  timerState.timeLeft = timerState.totalTime;
+  timerState.phase = 'hold';
+  timerState.totalTime = ex.duration;
+  timerState.timeLeft = ex.duration;
   updateTimerDisplay();
 }
 
 function skipRound() {
   timerState.timeLeft = 0;
-  advance();
+  advancePhase();
 }
 
 function togglePause() {
@@ -958,7 +1000,9 @@ function togglePause() {
 function closeTimer() {
   timerState.active = false;
   if (timerState.interval) clearInterval(timerState.interval);
-  document.getElementById('timerOverlay').classList.remove('active');
+  const overlay = document.getElementById('timerOverlay');
+  overlay.classList.remove('active');
+  overlay.classList.remove('rest');
   const t = i18n[currentLang];
   document.getElementById('pauseBtn').textContent = t.pause;
 }
