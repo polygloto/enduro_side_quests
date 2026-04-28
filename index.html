@@ -346,6 +346,7 @@
   }
 
   .timer-overlay.active { display: flex; }
+  body.timer-open { overflow: hidden; }
 
   .timer-img {
     width: 100%;
@@ -716,7 +717,7 @@ const i18n = {
       '<b>Задняя поверхность бедра</b> — для атаки (наклон вперёд над рулём).',
       '<b>Голеностоп</b> — контроль задней тормозной, переходы сидя/стоя.'
     ],
-    footer: 'v1.5 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
+    footer: 'v1.6 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
     ex_technique: 'Техника',
     ex_tip: 'Нюанс',
     ex_start: '▶ Старт таймер',
@@ -764,7 +765,7 @@ const i18n = {
       '<b>Hamstrings</b> — for the attack position (forward lean over the bars).',
       '<b>Ankles</b> — rear brake control, sit-to-stand transitions.'
     ],
-    footer: 'v1.5 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
+    footer: 'v1.6 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
     ex_technique: 'Technique',
     ex_tip: 'Key point',
     ex_start: '▶ Start timer',
@@ -949,6 +950,7 @@ function startTimer(idx) {
   timerState.timeLeft = ex.duration;
   document.getElementById('timerImg').src = `images/${idx+1}.png`;
   document.getElementById('timerOverlay').classList.add('active');
+  document.body.classList.add('timer-open');
   updateTimerDisplay();
   runTick();
 }
@@ -1052,6 +1054,7 @@ function closeTimer() {
   const overlay = document.getElementById('timerOverlay');
   overlay.classList.remove('active');
   overlay.classList.remove('rest');
+  document.body.classList.remove('timer-open');
   const t = i18n[currentLang];
   document.getElementById('pauseBtn').textContent = t.pause;
 }
