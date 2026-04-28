@@ -53,7 +53,9 @@
   .lang-switch {
     display: flex;
     justify-content: flex-end;
+    gap: 8px;
     margin-bottom: 16px;
+    flex-wrap: wrap;
   }
 
   .lang-switch-inner {
@@ -522,6 +524,11 @@
 
 <header>
   <div class="lang-switch">
+    <div class="lang-switch-inner" id="levelSwitch">
+      <button class="lang-btn active" data-level="0">LVL 1</button>
+      <button class="lang-btn" data-level="1">LVL 2</button>
+      <button class="lang-btn" data-level="2">LVL 3</button>
+    </div>
     <div class="lang-switch-inner" id="langSwitch">
       <button class="lang-btn" data-lang="ru">RU</button>
       <button class="lang-btn active" data-lang="en">EN</button>
@@ -570,7 +577,8 @@
 <script>
 const exercises = [
   {
-    sets: 2, duration: 40, sides: 1,
+    sides: 1,
+    levels: [{ sets: 2, duration: 40 }, { sets: 2, duration: 60 }, { sets: 3, duration: 60 }],
     ru: {
       name: "Наклон вперёд стоя",
       technique: "Стоя, ноги на ширине таза, слегка согнуты в коленях. Плавно наклоняйся вперёд от таза (не округляя поясницу в самом начале). Руки свободно висят к полу или держишься за голени. Почувствуй натяжение по задней поверхности бедра и икрам.",
@@ -583,7 +591,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 40, sides: 2,
+    sides: 2,
+    levels: [{ sets: 2, duration: 40 }, { sets: 2, duration: 55 }, { sets: 3, duration: 55 }],
     ru: {
       name: "Глубокий выпад с опусканием таза",
       technique: "Шаг вперёд, переднее колено над пяткой под 90°. Заднее колено опусти на пол (подложи мат). Медленно опускай таз вниз и немного вперёд, толкая передней бедренной костью в пол. Корпус вертикально, грудь раскрыта.",
@@ -596,7 +605,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 45, sides: 2,
+    sides: 2,
+    levels: [{ sets: 2, duration: 45 }, { sets: 2, duration: 60 }, { sets: 3, duration: 60 }],
     ru: {
       name: "Поза голубя (Pigeon)",
       technique: "Из упора на руках и коленях выведи правое колено вперёд к правому запястью, голень под углом к корпусу (ближе к параллели с ковриком, если гибкость позволяет). Левая нога вытянута назад прямо. Опусти бёдра к полу, корпус сверху или наклоняйся вперёд на локти.",
@@ -609,7 +619,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 45, sides: 1,
+    sides: 1,
+    levels: [{ sets: 2, duration: 45 }, { sets: 2, duration: 60 }, { sets: 3, duration: 60 }],
     ru: {
       name: "Поза бабочки с наклоном",
       technique: "Сядь на пол, соедини стопы подошвами, колени разведи в стороны. Пятки подтяни ближе к паху. Ухватись за стопы, спина прямая, с выдохом наклоняйся вперёд от таза, стараясь опустить грудь к стопам.",
@@ -622,7 +633,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 45, sides: 1,
+    sides: 1,
+    levels: [{ sets: 2, duration: 45 }, { sets: 2, duration: 60 }, { sets: 2, duration: 80 }],
     ru: {
       name: "Широкий присед (Malasana)",
       technique: "Стопы шире плеч, носки чуть наружу. Присядь максимально низко, таз опустить близко к полу. Локти поставь изнутри коленей и слегка раздвигай их наружу. Спина прямая, грудь раскрыта вверх.",
@@ -635,7 +647,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 40, sides: 2,
+    sides: 2,
+    levels: [{ sets: 2, duration: 40 }, { sets: 2, duration: 50 }, { sets: 3, duration: 55 }],
     ru: {
       name: "Растяжка квадрицепса стоя",
       technique: "Стоя (можно держаться за опору), согни ногу в колене и возьми стопу рукой сзади. Подтяни пятку к ягодице. Колени держи рядом. Слегка подай таз вперёд для усиления — почувствуешь тянет в передней части бедра.",
@@ -648,7 +661,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 40, sides: 2,
+    sides: 2,
+    levels: [{ sets: 2, duration: 40 }, { sets: 2, duration: 50 }, { sets: 3, duration: 55 }],
     ru: {
       name: "Боковой выпад (Cossack)",
       technique: "Широкая стойка, ноги прямые. Сгибай одну ногу в колене, опуская таз вбок и назад над этой стопой. Вторая нога остаётся прямой, носок можно поднять на себя. Вес в пятке согнутой ноги. Грудь раскрыта.",
@@ -661,7 +675,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 40, sides: 2,
+    sides: 2,
+    levels: [{ sets: 2, duration: 40 }, { sets: 2, duration: 55 }, { sets: 3, duration: 55 }],
     ru: {
       name: "Растяжка икры у стены",
       technique: "Стоя перед стеной, руки упёрты в стену на уровне груди. Одна нога делает шаг назад — стопа плотно прижата к полу, пятка не отрывается, нога прямая. Передняя нога согнута. Подавайся корпусом к стене.",
@@ -674,7 +689,8 @@ const exercises = [
     }
   },
   {
-    sets: 2, duration: 40, sides: 2,
+    sides: 2,
+    levels: [{ sets: 2, duration: 40 }, { sets: 2, duration: 55 }, { sets: 3, duration: 55 }],
     ru: {
       name: "Скручивания лёжа (twist)",
       technique: "Лёжа на спине, руки в стороны (T-поза). Согни правое колено и перекинь его через левую сторону к полу. Голову поверни вправо. Левая нога остаётся прямой на полу. Плечи прижаты, не отрывай от пола.",
@@ -717,7 +733,7 @@ const i18n = {
       '<b>Задняя поверхность бедра</b> — для атаки (наклон вперёд над рулём).',
       '<b>Голеностоп</b> — контроль задней тормозной, переходы сидя/стоя.'
     ],
-    footer: 'v1.6 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
+    footer: 'v1.7 · LOCAL STATE · OFFLINE READY<br>Прогресс сохраняется локально в браузере',
     ex_technique: 'Техника',
     ex_tip: 'Нюанс',
     ex_start: '▶ Старт таймер',
@@ -765,7 +781,7 @@ const i18n = {
       '<b>Hamstrings</b> — for the attack position (forward lean over the bars).',
       '<b>Ankles</b> — rear brake control, sit-to-stand transitions.'
     ],
-    footer: 'v1.6 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
+    footer: 'v1.7 · LOCAL STATE · OFFLINE READY<br>Progress saved locally in your browser',
     ex_technique: 'Technique',
     ex_tip: 'Key point',
     ex_start: '▶ Start timer',
@@ -787,22 +803,26 @@ const i18n = {
   }
 };
 
-const STORAGE = { done: 'enduro:done', lang: 'enduro:lang' };
+const STORAGE = { done: 'enduro:done', lang: 'enduro:lang', level: 'enduro:level' };
 const REST_DURATION = 15;
+const LEVEL_COUNT = 3;
 
 let currentLang = 'en';
+let currentLevel = 0;
 const doneSet = new Set();
 const openSet = new Set();
 const timerState = {
   active: false, paused: false, phase: 'hold', exerciseIdx: 0,
   currentSide: 0, currentRound: 0, totalRounds: 2,
-  timeLeft: 0, totalTime: 0, interval: null
+  holdDuration: 0, timeLeft: 0, totalTime: 0, interval: null
 };
 
 function loadState() {
   try {
     const lang = localStorage.getItem(STORAGE.lang);
     if (lang === 'ru' || lang === 'en') currentLang = lang;
+    const level = parseInt(localStorage.getItem(STORAGE.level), 10);
+    if (Number.isInteger(level) && level >= 0 && level < LEVEL_COUNT) currentLevel = level;
     const done = JSON.parse(localStorage.getItem(STORAGE.done) || '[]');
     if (Array.isArray(done)) done.forEach(i => {
       if (Number.isInteger(i) && i >= 0 && i < exercises.length) doneSet.add(i);
@@ -818,10 +838,41 @@ function saveLang() {
   try { localStorage.setItem(STORAGE.lang, currentLang); } catch (e) {}
 }
 
+function saveLevel() {
+  try { localStorage.setItem(STORAGE.level, String(currentLevel)); } catch (e) {}
+}
+
+function getDose(ex) {
+  return ex.levels[currentLevel] || ex.levels[0];
+}
+
+function holdRangeText() {
+  const ds = exercises.map(ex => getDose(ex).duration);
+  const min = Math.min(...ds), max = Math.max(...ds);
+  return min === max ? `${min}` : `${min}-${max}`;
+}
+
+function setsRangeText() {
+  const ss = exercises.map(ex => getDose(ex).sets);
+  const min = Math.min(...ss), max = Math.max(...ss);
+  return min === max ? `${min}` : `${min}-${max}`;
+}
+
+function totalMinutes() {
+  let total = 0;
+  for (const ex of exercises) {
+    const d = getDose(ex);
+    const holds = d.sets * ex.sides;
+    total += holds * d.duration + Math.max(0, holds - 1) * REST_DURATION;
+  }
+  return Math.round(total / 60);
+}
+
 function formatDose(ex, lang) {
   const t = i18n[lang];
+  const d = getDose(ex);
   const each = ex.sides === 2 ? t.dose_each : '';
-  return `${ex.sets} × ${ex.duration} ${t.dose_unit}${each}`;
+  return `${d.sets} × ${d.duration} ${t.dose_unit}${each}`;
 }
 
 function setLang(lang) {
@@ -830,18 +881,28 @@ function setLang(lang) {
   renderAll();
 }
 
+function setLevel(level) {
+  if (!Number.isInteger(level) || level < 0 || level >= LEVEL_COUNT) return;
+  currentLevel = level;
+  saveLevel();
+  renderAll();
+}
+
 function renderAll() {
   const t = i18n[currentLang];
   document.documentElement.lang = currentLang;
-  document.querySelectorAll('.lang-btn').forEach(b => {
+  document.querySelectorAll('[data-lang]').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === currentLang);
+  });
+  document.querySelectorAll('[data-level]').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.level) === currentLevel);
   });
   document.getElementById('t-brand').textContent = t.brand;
   document.getElementById('t-title').innerHTML = t.title;
   document.getElementById('t-subtitle').textContent = t.subtitle;
 
   document.getElementById('t-meta').innerHTML = `
-    <span><b>25</b> ${t.meta_min}</span>
+    <span><b>${totalMinutes()}</b> ${t.meta_min}</span>
     <span><b>${exercises.length}</b> ${t.meta_ex}</span>
     <span><b>${t.meta_mode_val}</b> ${t.meta_mode_label}</span>
   `;
@@ -850,8 +911,8 @@ function renderAll() {
 
   document.getElementById('t-stats').innerHTML = `
     <div class="stat"><div class="stat-val">3-5</div><div class="stat-label">${t.stat_warmup}</div></div>
-    <div class="stat"><div class="stat-val">30-45</div><div class="stat-label">${t.stat_hold}</div></div>
-    <div class="stat"><div class="stat-val">2</div><div class="stat-label">${t.stat_sets}</div></div>
+    <div class="stat"><div class="stat-val">${holdRangeText()}</div><div class="stat-label">${t.stat_hold}</div></div>
+    <div class="stat"><div class="stat-val">${setsRangeText()}</div><div class="stat-label">${t.stat_sets}</div></div>
   `;
 
   document.getElementById('resetBtn').textContent = t.reset;
@@ -939,15 +1000,17 @@ function resetProgress() {
 
 function startTimer(idx) {
   const ex = exercises[idx];
+  const d = getDose(ex);
   timerState.active = true;
   timerState.paused = false;
   timerState.phase = 'hold';
   timerState.exerciseIdx = idx;
   timerState.currentSide = 0;
   timerState.currentRound = 0;
-  timerState.totalRounds = ex.sets;
-  timerState.totalTime = ex.duration;
-  timerState.timeLeft = ex.duration;
+  timerState.totalRounds = d.sets;
+  timerState.holdDuration = d.duration;
+  timerState.totalTime = d.duration;
+  timerState.timeLeft = d.duration;
   document.getElementById('timerImg').src = `images/${idx+1}.png`;
   document.getElementById('timerOverlay').classList.add('active');
   document.body.classList.add('timer-open');
@@ -1032,8 +1095,8 @@ function advancePhase() {
     timerState.currentRound++;
   }
   timerState.phase = 'hold';
-  timerState.totalTime = ex.duration;
-  timerState.timeLeft = ex.duration;
+  timerState.totalTime = timerState.holdDuration;
+  timerState.timeLeft = timerState.holdDuration;
   updateTimerDisplay();
 }
 
@@ -1088,6 +1151,11 @@ document.getElementById('exerciseList').addEventListener('click', (e) => {
 document.getElementById('langSwitch').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-lang]');
   if (btn) setLang(btn.dataset.lang);
+});
+
+document.getElementById('levelSwitch').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-level]');
+  if (btn) setLevel(Number(btn.dataset.level));
 });
 
 document.getElementById('resetBtn').addEventListener('click', resetProgress);
